@@ -28,11 +28,16 @@ function mostrarPersonajes(lista){
 
     if(lista.length === 0) {
         mensaje.innerHTML = `<div class="alert alert-warning">No se encontraron personajes</div>`;
+
+        return;
     }
 
     mensaje.innerHTML = "";
+
     lista.forEach((personaje) => {
+
         const imagen = CDN_URL + personaje.portrait_path;
+
         contenedor.innerHTML += `
          <div class="col-md-3">
         <div class="card h-100">
@@ -59,9 +64,43 @@ function filtrarPersonajes () {
         mostrarPersonajes(personajes);
         return;
     }
+
     const filtrados = personajes.filter((personaje) => 
 
         personaje.name.toLowerCase().includes(texto)
     );
     mostrarPersonajes(filtrados);
+}
+
+async function obtenerDetalle(id) {
+    try {
+
+        const respuesta = await fetch(`${API_URL}/${id}`);
+
+        const personaje = await respuesta.json()
+
+        mostrarModal(personaje);
+
+    } catch (error){
+        console.log(error);
+        alert("No se pudo cargar el detalle del personaje");
+    }
+}
+
+function mostrarModal(personaje){
+
+    document.getElementById("modalNombre").textContent = personaje.name;
+    document.getElementById("modalImagen").src = CDN_URL + personaje.portrait_path;
+
+    document.getElementById("modalEdad").textContent = personaje.age ?? "Desconocida";
+    document.getElementById("modalNacimiento").textContent = personaje.birthdate ?? "Desconocida";
+    document.getElementById("modalGenero").textContent = personaje.occupation;
+    document.getElementById("modalOcupacion").textContent = personaje.occupation;
+    document.getElementById("modalEstado").textContent = personaje.status;
+
+    document.getElementById("modalFrase").textContent = personaje.phrases[0] ?? "Sin frases";
+
+
+    const modal = new bootstrap.Modal(document.getElementById("modalDetalle"));
+    modal.show();
 }
